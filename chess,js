@@ -1,0 +1,220 @@
+let board;
+let game = new Chess();
+let premoveMode = false;
+let premoveMoves = [];
+
+function enablePremove() {
+    premoveMode = true;
+    premoveMoves = [];
+}
+
+function startPremove() {
+    if (premoveMoves.length > 0) {
+        for (let move of premoveMoves) {
+            game.ugly_move(move);
+            board.position(game.fen());
+            updateStatus();
+        }
+        premoveMode = false;
+        premoveMoves = [];
+    }
+}
+
+function onDragStart (source, piece, position, orientation) {
+    if (game.in_checkmate() === true || game.in_draw() === true ||
+        piece.search(/^b/) !== -1 || (game.turn() === 'w' && piece.search(/^wN/) === -1)) {
+        return false;
+    }
+}
+
+function makeBestMove () {
+    let bestMove = getBestMove(game);
+    game.ugly_move(bestMove);
+    board.position(game.fen());
+    renderMoveHistory(game.history());
+    if (game.game_over()) {
+        alert('Game over');
+    }
+}
+
+function renderMoveHistory (moves) {
+    let historyElement = $('#move-history').empty();
+    historyElement.empty();
+    for (let i = 0; i < moves.length; i = i + 2) {
+        historyElement.append('<span>' + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : '...') + '</span><br>')
+    }
+    historyElement.scrollTop(historyElement[0].scrollHeight);
+
+}
+
+function getBestMove (game) {
+    if (game.game_over()) {
+        alert('Game over');
+    }
+
+    return getStockfishMove();
+}
+
+function renderStatus () {
+    let status = '';
+
+    let moveColor = 'White';
+    if (game.turn() === 'b') {
+        moveColor = 'Black';
+    }
+
+    if (game.in_checkmate() === true) {
+        status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+
+    else if (game.in_draw() === true) {
+        status = 'Game over, drawn position';
+    }
+
+    else {
+        status = moveColor + ' to move';
+
+        if (game.in_check() === true) {
+            status += ', ' + moveColor + ' is in check';
+        }
+    }
+
+    $('#status').html(status);
+}
+
+function updateStatus () {
+    let status = '';
+
+    let moveColor = 'White';
+    if (game.turn() === 'b') {
+        moveColor = 'Black';
+    }
+
+    if (game.in_checkmate() === true) {
+        status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+
+    else if (game.in_draw() === true) {
+        status = 'Game over, drawn position';
+    }
+
+    else {
+        status = moveColor + ' to move';
+
+        if (game.in_check() === true) {
+            status += ', ' + moveColor + ' is in check';
+        }
+    }
+
+    $('#status').html(status);
+    $('#fen').html(game.fen());
+    $('#pgn').html(game.pgn());
+    renderMoveHistory(game.history({ verbose: true }));
+    $('#moves').html(prettyPrint(game.pgn()));
+    board.position(game.fen());
+    updatePGN();
+}
+
+function updatePGN() {
+    let pgn = game.pgn();
+    $('#pgn').text(pgn);
+}
+
+function renderMoveHistory(moves) {
+    let historyElement = $('#move-history').empty();
+    historyElement.empty();
+    historyElement.html('<span>Move History:</span>');
+    for (let i = 0; i < moves.length; i = i + 2) {
+        historyElement.append('<span>' + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : '...') + '</span><br>')
+    }
+    historyElement.scrollTop(historyElement[0].scrollHeight);
+}
+
+function onMouseoverSquare(square, piece) {
+    let moves = game.ugly_moves({ square: square, verbose: true });
+    if (moves.length === 0) return;
+
+    highlightSquare(square, moves);
+    highlightLegalMoves(moves);
+}
+
+function onMouseoutSquare(square, piece) {
+    removeHighlights(square);
+}
+
+function onDragMove (newLocation, oldLocation, source, piece, position, orientation) {
+    if (premoveMode) {
+        let move = {
+            from: oldLocation,
+            to: newLocation,
+            promotion: 'q' // always promote to a queen for example simplicity
+        };
+
+        if (game.move(move) === null) {
+            premoveMode = false;
+            premoveMoves = [];
+            alert('Invalid move! Premove canceled.');
+        } else {
+            premoveMoves.push(move);
+        }
+    }
+}
+
+function onDrop (source, target) {
+    removeHighlights(target);
+
+    let move = game.ugly_move({ from: source, to: target, promotion: 'q' });
+
+    renderMoveHistory(game.history());
+    updateStatus();
+    premoveMode = false;
+    premoveMoves = [];
+
+    if (game.in_checkmate() === true) {
+        alert('Game over, you are in checkmate!');
+    }
+
+    window.setTimeout(makeBestMove, 250);
+}
+
+function onSnapEnd () {
+    board.position(game.fen());
+}
+
+function highlightSquare(square, moves) {
+    let squareEl = $('#chessboard .square-' + square);
+
+    if (squareEl.hasClass('black-3c85d') === true) {
+        return squareEl.addClass('highlight-black');
+    }
+
+    if (squareEl.hasClass('white-1e1d7') === true) {
+        return squareEl.addClass('highlight-white');
+    }
+}
+
+function removeHighlights (square) {
+    $('#chessboard .square-55d63').css('background', '');
+}
+
+function highlightLegalMoves(moves) {
+    for (let i = 0; i < moves.length; i++) {
+        highlightSquare(moves[i].to, moves);
+    }
+}
+
+let config = {
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onMouseoverSquare: onMouseoverSquare,
+    onMouseoutSquare: onMouseoutSquare,
+    onSnapEnd: onSnapEnd,
+    onDragMove: onDragMove,
+};
+
+board = Chessboard('chessboard', config);
+
+$(window).resize(board.resize);
+updateStatus();
