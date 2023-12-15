@@ -1,61 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Kanit&display=swap" rel="stylesheet">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            background-color: black; /* Change to the desired background color */
-            color: white; /* Change to the desired text color */
-            font-family: 'Cabin', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        #header {
-            padding: 20px; /* Increase padding for the header */
-        }
-
-        .back-arrow {
-            font-size: 36px; /* Increase font size for the arrow */
-            text-decoration: none;
-            color: white; /* Match text color to the theme */
-            font-weight: bold; /* Make the arrow thicker */
-        }
-
-        #content {
-            text-align: center;
-            margin: 50px;
-        }
-
-        #coolland-smp-title {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        #work-in-progress {
-            font-size: 18px;
-        }
-    </style>
-    <title>Coolland SMP</title>
+    <link rel="stylesheet" href="styles.css">
+    <title>Chess Game</title>
 </head>
-
 <body>
+    <div id="chessboard"></div>
+    <button id="premoveButton" onclick="enablePremove()">Enable Premove</button>
+    <button id="startPremoveButton" onclick="startPremove()">Start Premove</button>
 
-    <div id="header">
-        <a href="https://coollandmain.github.io" class="back-arrow">&#8592;</a>
-    </div>
-
-    <div id="content">
-        <h1 id="coolland-smp-title">Coolland SMP</h1>
-        <p id="work-in-progress">THIS IS WORK IN PROGRESS</p>
-    </div>
-
+    <script src="chess.js"></script>
 </body>
-
 </html>
