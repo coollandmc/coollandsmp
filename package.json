@@ -1,29 +1,24 @@
 {
-  "author": "Chris Oakman <chris@oakmac.com> (http://chrisoakman.com/)",
-  "name": "@chrisoakman/chessboardjs",
-  "description": "JavaScript chessboard widget",
-  "homepage": "https://chessboardjs.com",
-  "license": "MIT",
-  "version": "1.0.0",
+  "name": "chess.js",
+  "version": "0.13.4",
+  "license": "BSD-2-Clause",
+  "type": "module",
+  "main": "chess.js",
+  "homepage": "https://github.com/jhlywa/chess.js",
+  "author": "Jeff Hlywa <jhlywa@gmail.com>",
+  "keywords": [
+    "chess"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/oakmac/chessboardjs.git"
-  },
-  "files": ["dist/"],
-  "dependencies": {
-    "jquery": ">=3.4.1"
+    "url": "https://github.com/jhlywa/chess.js.git"
   },
   "devDependencies": {
-    "csso": "3.5.1",
-    "fs-plus": "3.1.1",
-    "kidif": "1.1.0",
-    "mustache": "2.3.0",
-    "standard": "10.0.2",
-    "uglify-js": "3.6.0"
+    "jest": "^27.5.1",
+    "prettier": "^2.6.0"
   },
   "scripts": {
-    "build": "standard lib/chessboard.js && node scripts/build.js",
-    "standard": "standard --fix lib/*.js website/js/*.js",
-    "website": "node scripts/website.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "format": "prettier --write **/*.{js,json}"
   }
 }
